@@ -39,11 +39,11 @@ public:
   const std::shared_ptr<std_srvs::srv::SetBool::Response> enableCallbacks(const std::shared_ptr<std_srvs::srv::SetBool::Request> &request);
   const std::shared_ptr<std_srvs::srv::Trigger::Response> switchOdometrySource(const mrs_msgs::msg::UavState &new_uav_state);
 
-  const std::shared_ptr<mrs_msgs::srv::ReferenceSrv::Response> setReference(const std::shared_ptr<mrs_msgs::srv::ReferenceSrv::Request> &request);
-  const std::shared_ptr<mrs_msgs::srv::VelocityReferenceSrv::Response>
-  setVelocityReference(const std::shared_ptr<mrs_msgs::srv::VelocityReferenceSrv::Request> &request);
-  const std::shared_ptr<mrs_msgs::srv::TrajectoryReferenceSrv::Response>
-  setTrajectoryReference(const std::shared_ptr<mrs_msgs::srv::TrajectoryReferenceSrv::Request> &request);
+  const std::shared_ptr<mrs_msgs::srv::ReferenceSrv::Response>         setReference(const std::shared_ptr<mrs_msgs::srv::ReferenceSrv::Request> &request);
+  const std::shared_ptr<mrs_msgs::srv::VelocityReferenceSrv::Response> setVelocityReference(
+      const std::shared_ptr<mrs_msgs::srv::VelocityReferenceSrv::Request> &request);
+  const std::shared_ptr<mrs_msgs::srv::TrajectoryReferenceSrv::Response> setTrajectoryReference(
+      const std::shared_ptr<mrs_msgs::srv::TrajectoryReferenceSrv::Request> &request);
 
   const std::shared_ptr<std_srvs::srv::Trigger::Response> hover(const std::shared_ptr<std_srvs::srv::Trigger::Request> &request);
   const std::shared_ptr<std_srvs::srv::Trigger::Response> startTrajectoryTracking(const std::shared_ptr<std_srvs::srv::Trigger::Request> &request);
@@ -51,8 +51,8 @@ public:
   const std::shared_ptr<std_srvs::srv::Trigger::Response> resumeTrajectoryTracking(const std::shared_ptr<std_srvs::srv::Trigger::Request> &request);
   const std::shared_ptr<std_srvs::srv::Trigger::Response> gotoTrajectoryStart(const std::shared_ptr<std_srvs::srv::Trigger::Request> &request);
 
-  const std::shared_ptr<mrs_msgs::srv::DynamicsConstraintsSrv::Response>
-  setConstraints(const std::shared_ptr<mrs_msgs::srv::DynamicsConstraintsSrv::Request> &request);
+  const std::shared_ptr<mrs_msgs::srv::DynamicsConstraintsSrv::Response> setConstraints(
+      const std::shared_ptr<mrs_msgs::srv::DynamicsConstraintsSrv::Request> &request);
 
 private:
   rclcpp::Node::SharedPtr  node_;
@@ -181,9 +181,8 @@ bool MidairActivationTracker::resetStatic(void) {
 
 /* //{ update() */
 
-std::optional<mrs_msgs::msg::TrackerCommand>
-MidairActivationTracker::update(const mrs_msgs::msg::UavState                                      &uav_state,
-                                [[maybe_unused]] const mrs_uav_managers::Controller::ControlOutput &last_control_output) {
+std::optional<mrs_msgs::msg::TrackerCommand> MidairActivationTracker::update(
+    const mrs_msgs::msg::UavState &uav_state, [[maybe_unused]] const mrs_uav_managers::Controller::ControlOutput &last_control_output) {
 
   // up to this part the update() method is evaluated even when the tracker is not active
   if (!is_active_) {
@@ -246,8 +245,8 @@ const mrs_msgs::msg::TrackerStatus MidairActivationTracker::getStatus() {
 
 /* //{ enableCallbacks() */
 
-const std::shared_ptr<std_srvs::srv::SetBool::Response>
-MidairActivationTracker::enableCallbacks([[maybe_unused]] const std::shared_ptr<std_srvs::srv::SetBool::Request> &request) {
+const std::shared_ptr<std_srvs::srv::SetBool::Response> MidairActivationTracker::enableCallbacks(
+    [[maybe_unused]] const std::shared_ptr<std_srvs::srv::SetBool::Request> &request) {
 
   std::shared_ptr<std_srvs::srv::SetBool::Response> response = std::make_shared<std_srvs::srv::SetBool::Response>();
 
@@ -261,8 +260,8 @@ MidairActivationTracker::enableCallbacks([[maybe_unused]] const std::shared_ptr<
 
 /* switchOdometrySource() //{ */
 
-const std::shared_ptr<std_srvs::srv::Trigger::Response>
-MidairActivationTracker::switchOdometrySource([[maybe_unused]] const mrs_msgs::msg::UavState &new_uav_state) {
+const std::shared_ptr<std_srvs::srv::Trigger::Response> MidairActivationTracker::switchOdometrySource(
+    [[maybe_unused]] const mrs_msgs::msg::UavState &new_uav_state) {
 
   return nullptr;
 }
@@ -271,8 +270,8 @@ MidairActivationTracker::switchOdometrySource([[maybe_unused]] const mrs_msgs::m
 
 /* //{ hover() */
 
-const std::shared_ptr<std_srvs::srv::Trigger::Response>
-MidairActivationTracker::hover([[maybe_unused]] const std::shared_ptr<std_srvs::srv::Trigger::Request> &request) {
+const std::shared_ptr<std_srvs::srv::Trigger::Response> MidairActivationTracker::hover(
+    [[maybe_unused]] const std::shared_ptr<std_srvs::srv::Trigger::Request> &request) {
 
   return nullptr;
 }
@@ -281,8 +280,8 @@ MidairActivationTracker::hover([[maybe_unused]] const std::shared_ptr<std_srvs::
 
 /* //{ startTrajectoryTracking() */
 
-const std::shared_ptr<std_srvs::srv::Trigger::Response>
-MidairActivationTracker::startTrajectoryTracking([[maybe_unused]] const std::shared_ptr<std_srvs::srv::Trigger::Request> &request) {
+const std::shared_ptr<std_srvs::srv::Trigger::Response> MidairActivationTracker::startTrajectoryTracking(
+    [[maybe_unused]] const std::shared_ptr<std_srvs::srv::Trigger::Request> &request) {
 
   return nullptr;
 }
@@ -291,8 +290,8 @@ MidairActivationTracker::startTrajectoryTracking([[maybe_unused]] const std::sha
 
 /* //{ stopTrajectoryTracking() */
 
-const std::shared_ptr<std_srvs::srv::Trigger::Response>
-MidairActivationTracker::stopTrajectoryTracking([[maybe_unused]] const std::shared_ptr<std_srvs::srv::Trigger::Request> &request) {
+const std::shared_ptr<std_srvs::srv::Trigger::Response> MidairActivationTracker::stopTrajectoryTracking(
+    [[maybe_unused]] const std::shared_ptr<std_srvs::srv::Trigger::Request> &request) {
 
   return nullptr;
 }
@@ -301,8 +300,8 @@ MidairActivationTracker::stopTrajectoryTracking([[maybe_unused]] const std::shar
 
 /* //{ resumeTrajectoryTracking() */
 
-const std::shared_ptr<std_srvs::srv::Trigger::Response>
-MidairActivationTracker::resumeTrajectoryTracking([[maybe_unused]] const std::shared_ptr<std_srvs::srv::Trigger::Request> &request) {
+const std::shared_ptr<std_srvs::srv::Trigger::Response> MidairActivationTracker::resumeTrajectoryTracking(
+    [[maybe_unused]] const std::shared_ptr<std_srvs::srv::Trigger::Request> &request) {
 
   return nullptr;
 }
@@ -311,8 +310,8 @@ MidairActivationTracker::resumeTrajectoryTracking([[maybe_unused]] const std::sh
 
 /* //{ gotoTrajectoryStart() */
 
-const std::shared_ptr<std_srvs::srv::Trigger::Response>
-MidairActivationTracker::gotoTrajectoryStart([[maybe_unused]] const std::shared_ptr<std_srvs::srv::Trigger::Request> &request) {
+const std::shared_ptr<std_srvs::srv::Trigger::Response> MidairActivationTracker::gotoTrajectoryStart(
+    [[maybe_unused]] const std::shared_ptr<std_srvs::srv::Trigger::Request> &request) {
 
   return nullptr;
 }
@@ -321,8 +320,8 @@ MidairActivationTracker::gotoTrajectoryStart([[maybe_unused]] const std::shared_
 
 /* //{ setConstraints() */
 
-const std::shared_ptr<mrs_msgs::srv::DynamicsConstraintsSrv::Response>
-MidairActivationTracker::setConstraints([[maybe_unused]] const std::shared_ptr<mrs_msgs::srv::DynamicsConstraintsSrv::Request> &request) {
+const std::shared_ptr<mrs_msgs::srv::DynamicsConstraintsSrv::Response> MidairActivationTracker::setConstraints(
+    [[maybe_unused]] const std::shared_ptr<mrs_msgs::srv::DynamicsConstraintsSrv::Request> &request) {
 
   std::shared_ptr<mrs_msgs::srv::DynamicsConstraintsSrv::Response> response = std::make_shared<mrs_msgs::srv::DynamicsConstraintsSrv::Response>();
 
@@ -336,8 +335,8 @@ MidairActivationTracker::setConstraints([[maybe_unused]] const std::shared_ptr<m
 
 /* //{ setReference() */
 
-const std::shared_ptr<mrs_msgs::srv::ReferenceSrv::Response>
-MidairActivationTracker::setReference([[maybe_unused]] const std::shared_ptr<mrs_msgs::srv::ReferenceSrv::Request> &request) {
+const std::shared_ptr<mrs_msgs::srv::ReferenceSrv::Response> MidairActivationTracker::setReference(
+    [[maybe_unused]] const std::shared_ptr<mrs_msgs::srv::ReferenceSrv::Request> &request) {
 
   return nullptr;
 }
@@ -346,8 +345,8 @@ MidairActivationTracker::setReference([[maybe_unused]] const std::shared_ptr<mrs
 
 /* //{ setVelocityReference() */
 
-const std::shared_ptr<mrs_msgs::srv::VelocityReferenceSrv::Response>
-MidairActivationTracker::setVelocityReference([[maybe_unused]] const std::shared_ptr<mrs_msgs::srv::VelocityReferenceSrv::Request> &request) {
+const std::shared_ptr<mrs_msgs::srv::VelocityReferenceSrv::Response> MidairActivationTracker::setVelocityReference(
+    [[maybe_unused]] const std::shared_ptr<mrs_msgs::srv::VelocityReferenceSrv::Request> &request) {
 
   return nullptr;
 }
@@ -356,17 +355,17 @@ MidairActivationTracker::setVelocityReference([[maybe_unused]] const std::shared
 
 /* //{ setTrajectoryReference() */
 
-const std::shared_ptr<mrs_msgs::srv::TrajectoryReferenceSrv::Response>
-MidairActivationTracker::setTrajectoryReference([[maybe_unused]] const std::shared_ptr<mrs_msgs::srv::TrajectoryReferenceSrv::Request> &request) {
+const std::shared_ptr<mrs_msgs::srv::TrajectoryReferenceSrv::Response> MidairActivationTracker::setTrajectoryReference(
+    [[maybe_unused]] const std::shared_ptr<mrs_msgs::srv::TrajectoryReferenceSrv::Request> &request) {
 
   return nullptr;
 }
 
 //}
 
-} // namespace midair_activation_tracker
+}  // namespace midair_activation_tracker
 
-} // namespace mrs_uav_trackers
+}  // namespace mrs_uav_trackers
 
 #include <pluginlib/class_list_macros.hpp>
 PLUGINLIB_EXPORT_CLASS(mrs_uav_trackers::midair_activation_tracker::MidairActivationTracker, mrs_uav_managers::Tracker)
