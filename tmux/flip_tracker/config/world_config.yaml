@@ -11,7 +11,7 @@ mrs_uav_managers:
 
     safety_area:
 
-      enabled: false
+      enabled: true
 
       horizontal:
 
@@ -35,7 +35,7 @@ mrs_uav_managers:
         frame_name: "world_origin"
 
         max_z: 15.0
-        min_z: -2.0
+        min_z: 0.5
 
       obstacles:
 

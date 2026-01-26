@@ -104,10 +104,9 @@ target_compile_definitions(MrsUavTrackers_LineTracker PRIVATE USE_ROS_TIMER=${US
 
 # MPC Tracker (only if mrs_mpc_solvers is available)
 
-if(mrs_mpc_solvers_FOUND)
-  add_library(MrsUavTrackers_MpcTracker SHARED
-    src/mpc_tracker.cpp
-    )
+add_library(MrsUavTrackers_MpcTracker SHARED
+  src/mpc_tracker.cpp
+  )
 
   ament_target_dependencies(MrsUavTrackers_MpcTracker
     ${DEPENDENCIES}

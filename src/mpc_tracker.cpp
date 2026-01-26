@@ -853,7 +853,7 @@ bool MpcTracker::initialize(
     opts.callback_group = cbkgrp_timers_;
 
     timer_avoidance_trajectory_ = std::make_shared<TimerType>(
-        opts, rclcpp::Rate(_avoidance_trajectory_rate_), callback_fcn);
+        opts, rclcpp::Rate(_avoidance_trajectory_rate_, clock_), callback_fcn);
   }
 
   {
@@ -861,14 +861,15 @@ bool MpcTracker::initialize(
         std::bind(&MpcTracker::timerDiagnostics, this);
 
     timer_diagnostics_ = std::make_shared<TimerType>(
-        timer_opts_start, rclcpp::Rate(_diagnostics_rate_), callback_fcn);
+        timer_opts_start, rclcpp::Rate(_diagnostics_rate_, clock_),
+        callback_fcn);
   }
 
   {
     std::function<void()> callback_fcn = std::bind(&MpcTracker::timerMPC, this);
 
     timer_mpc_iteration_ = std::make_shared<TimerType>(
-        timer_opts_no_start, rclcpp::Rate(_mpc_asynchronous_rate_),
+        timer_opts_no_start, rclcpp::Rate(_mpc_asynchronous_rate_, clock_),
         callback_fcn);
   }
 
@@ -878,7 +879,7 @@ bool MpcTracker::initialize(
 
     // TODO parametrize timer rate
     timer_velocity_tracking_ = std::make_shared<TimerType>(
-        timer_opts_no_start, rclcpp::Rate(30.0), callback_fcn);
+        timer_opts_no_start, rclcpp::Rate(30.0, clock_), callback_fcn);
   }
 
   {
@@ -887,7 +888,7 @@ bool MpcTracker::initialize(
 
     // TODO parametrize timer rate
     timer_hover_ = std::make_shared<TimerType>(
-        timer_opts_no_start, rclcpp::Rate(10.0), callback_fcn);
+        timer_opts_no_start, rclcpp::Rate(10.0, clock_), callback_fcn);
   }
 
   // | ----------------------- finish init ---------------------- |

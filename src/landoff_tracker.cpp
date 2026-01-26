@@ -419,7 +419,8 @@ bool LandoffTracker::initialize(
         std::bind(&LandoffTracker::timerMain, this);
 
     timer_main_ = std::make_shared<TimerType>(
-        timer_opts_start, rclcpp::Rate(_main_timer_rate_), callback_fcn);
+        timer_opts_start, rclcpp::Rate(_main_timer_rate_, clock_),
+        callback_fcn);
   }
 
   // | ----------------------- finish init ---------------------- |
