@@ -337,8 +337,7 @@ bool LineTracker::initialize(
         std::bind(&LineTracker::timerMain, this);
 
     timer_main_ = std::make_shared<TimerType>(
-        timer_opts_start, rclcpp::Rate(_tracker_loop_rate_, clock_),
-        callback_fcn);
+        timer_opts_start, rclcpp::Rate(_tracker_loop_rate_), callback_fcn);
   }
 
   is_initialized_ = true;
