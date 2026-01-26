@@ -3,7 +3,7 @@ project(mrs_uav_trackers)
 
 # set the correct standards
 set(CMAKE_C_STANDARD 99)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 1 == use rclcpp::Timer implementation
@@ -39,18 +39,31 @@ set(DEPENDENCIES
   sensor_msgs
   mrs_uav_managers
   Eigen3
+)
+
+set(OPTIONAL_DEPENDENCIES
   mrs_mpc_solvers
 )
 
 set(LIBRARIES
   MrsUavTrackers_LandoffTracker
   MrsUavTrackers_LineTracker
-  MrsUavTrackers_MpcTracker
   MrsUavTrackers_MidairActivationTracker
+  MrsUavTrackers_FlipTracker
   )
 
 foreach(DEP IN LISTS DEPENDENCIES)
   find_package(${DEP} REQUIRED)
+endforeach()
+
+foreach(DEP IN LISTS OPTIONAL_DEPENDENCIES)
+  find_package(${DEP} QUIET)
+  if(${DEP}_FOUND)
+    message(STATUS "Found optional dependency: ${DEP}")
+    list(APPEND DEPENDENCIES ${DEP})
+  else()
+    message(WARNING "Optional dependency not found: ${DEP}")
+  endif()
 endforeach()
 
 include_directories(
@@ -58,13 +71,17 @@ include_directories(
   ${rclcpp_INCLUDE_DIRS}
   ${mrs_lib_INCLUDE_DIRS}
   ${mrs_uav_managers_INCLUDE_DIRS}
-  ${mrs_mpc_solvers_INCLUDE_DIRS}
 )
+
+# Add optional include directories if found
+if(mrs_mpc_solvers_FOUND)
+  include_directories(${mrs_mpc_solvers_INCLUDE_DIRS})
+endif()
 
 # Landoff Tracker
 
 add_library(MrsUavTrackers_LandoffTracker SHARED
-  src/landoff_tracker/landoff_tracker.cpp
+  src/landoff_tracker.cpp
   )
 
 ament_target_dependencies(MrsUavTrackers_LandoffTracker
@@ -76,7 +93,7 @@ target_compile_definitions(MrsUavTrackers_LandoffTracker PRIVATE USE_ROS_TIMER=$
 # Line Tracker
 
 add_library(MrsUavTrackers_LineTracker SHARED
-  src/line_tracker/line_tracker.cpp
+  src/line_tracker.cpp
   )
 
 ament_target_dependencies(MrsUavTrackers_LineTracker
@@ -85,26 +102,39 @@ ament_target_dependencies(MrsUavTrackers_LineTracker
 
 target_compile_definitions(MrsUavTrackers_LineTracker PRIVATE USE_ROS_TIMER=${USE_ROS_TIMER})
 
-# MPC Tracker
+# MPC Tracker (only if mrs_mpc_solvers is available)
 
-add_library(MrsUavTrackers_MpcTracker SHARED
-  src/mpc_tracker/mpc_tracker.cpp
-  )
+if(mrs_mpc_solvers_FOUND)
+  add_library(MrsUavTrackers_MpcTracker SHARED
+    src/mpc_tracker.cpp
+    )
 
-ament_target_dependencies(MrsUavTrackers_MpcTracker
-  ${DEPENDENCIES}
-  )
+  ament_target_dependencies(MrsUavTrackers_MpcTracker
+    ${DEPENDENCIES}
+    )
 
-target_link_libraries(MrsUavTrackers_MpcTracker
-  ${MPC_CONTROLLER_SOLVER_BIN}
-  )
+  # Link to the MPC solver library
+  target_link_libraries(MrsUavTrackers_MpcTracker
+    ${mrs_mpc_solvers_LIBRARIES}
+    )
+  
+  target_include_directories(MrsUavTrackers_MpcTracker PUBLIC
+    ${mrs_mpc_solvers_INCLUDE_DIRS}
+    )
 
-target_compile_definitions(MrsUavTrackers_MpcTracker PRIVATE USE_ROS_TIMER=${USE_ROS_TIMER})
+  target_compile_definitions(MrsUavTrackers_MpcTracker PRIVATE USE_ROS_TIMER=${USE_ROS_TIMER})
+  
+  list(APPEND LIBRARIES MrsUavTrackers_MpcTracker)
+  message(STATUS "Building MrsUavTrackers_MpcTracker with mrs_mpc_solvers")
+else()
+  message(WARNING "Skipping MrsUavTrackers_MpcTracker - mrs_mpc_solvers not found")
+  list(REMOVE_ITEM LIBRARIES MrsUavTrackers_MpcTracker)
+endif()
 
 # Midair Activation Tracker
 
 add_library(MrsUavTrackers_MidairActivationTracker SHARED
-  src/midair_activation_tracker/midair_activation_tracker.cpp
+  src/midair_activation_tracker.cpp
   )
 
 ament_target_dependencies(MrsUavTrackers_MidairActivationTracker
@@ -112,6 +142,18 @@ ament_target_dependencies(MrsUavTrackers_MidairActivationTracker
   )
 
 target_compile_definitions(MrsUavTrackers_MidairActivationTracker PRIVATE USE_ROS_TIMER=${USE_ROS_TIMER})
+
+# Flip Tracker
+
+add_library(MrsUavTrackers_FlipTracker SHARED
+  src/flip_tracker.cpp
+  )
+
+ament_target_dependencies(MrsUavTrackers_FlipTracker
+  ${DEPENDENCIES}
+  )
+
+target_compile_definitions(MrsUavTrackers_FlipTracker PRIVATE USE_ROS_TIMER=${USE_ROS_TIMER})
 
 ## --------------------------------------------------------------
 ## |                       export plugins                       |

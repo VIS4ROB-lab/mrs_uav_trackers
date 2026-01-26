@@ -10,14 +10,23 @@
   </class>
 </library>
 
+<!-- MpcTracker: Requires mrs_mpc_solvers package to be built
+     Uncomment this section if you have mrs_mpc_solvers installed -->
 <library path="MrsUavTrackers_MpcTracker">
   <class type="mrs_uav_trackers::mpc_tracker::MpcTracker" base_class_type="mrs_uav_managers::Tracker">
     <description>MpcTracker</description>
   </class>
 </library>
 
+
 <library path="MrsUavTrackers_MidairActivationTracker">
   <class type="mrs_uav_trackers::midair_activation_tracker::MidairActivationTracker" base_class_type="mrs_uav_managers::Tracker">
     <description>MidairActivationTracker</description>
+  </class>
+</library>
+
+<library path="MrsUavTrackers_FlipTracker">
+  <class type="mrs_uav_trackers::flip_tracker::FlipTracker" base_class_type="mrs_uav_managers::Tracker">
+    <description>FlipTracker</description>
   </class>
 </library>
