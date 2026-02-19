@@ -236,6 +236,10 @@ std::optional<mrs_msgs::msg::TrackerCommand> MidairActivationTracker::update(
   tracker_cmd.velocity.y = uav_state.velocity.linear.y;
   tracker_cmd.velocity.z = uav_state.velocity.linear.z;
 
+  tracker_cmd.acceleration.x = 0;
+  tracker_cmd.acceleration.y = 0;
+  tracker_cmd.acceleration.z = 0;
+
   try {
     tracker_cmd.heading =
         mrs_lib::AttitudeConverter(uav_state.pose.orientation).getHeading();
@@ -245,6 +249,7 @@ std::optional<mrs_msgs::msg::TrackerCommand> MidairActivationTracker::update(
     RCLCPP_WARN_THROTTLE(node_->get_logger(), *clock_, 1000,
                          "[MidairActivationTracker]: could not get heading");
   }
+  tracker_cmd.heading_rate = 0;
 
   tracker_cmd.use_position_vertical = true;
   tracker_cmd.use_position_horizontal = true;
@@ -252,7 +257,10 @@ std::optional<mrs_msgs::msg::TrackerCommand> MidairActivationTracker::update(
   tracker_cmd.use_velocity_vertical = true;
   tracker_cmd.use_velocity_horizontal = true;
 
+  tracker_cmd.use_acceleration = true;
+
   tracker_cmd.use_heading = true;
+  tracker_cmd.use_heading_rate = true;
 
   RCLCPP_WARN_THROTTLE(node_->get_logger(), *clock_, 100,
                        "[MidairActivationTracker]: outputting cmd");
