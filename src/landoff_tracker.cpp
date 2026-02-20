@@ -635,9 +635,12 @@ std::optional<mrs_msgs::msg::TrackerCommand> LandoffTracker::update(
     position_output_.velocity.z =
         current_vertical_direction_ * current_vertical_speed_;
 
-    position_output_.acceleration.x = 0;
-    position_output_.acceleration.y = 0;
-    position_output_.acceleration.z = 0;
+    position_output_.acceleration.x =
+        cos(current_heading_) * current_horizontal_acceleration_;
+    position_output_.acceleration.y =
+        sin(current_heading_) * current_horizontal_acceleration_;
+    position_output_.acceleration.z =
+        current_vertical_direction_ * current_vertical_acceleration_;
 
     position_output_.heading = state_heading_;
     position_output_.heading_rate = speed_heading_;
