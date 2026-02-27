@@ -4,7 +4,7 @@ mrs_uav_trackers:
 
     main_timer_rate: 100 # [Hz]
 
-    landing_reference: -1.0 # [m], relative "z" reference to the UAV frame during landing
+    landing_reference: -2.0 # [m], relative "z" reference to the UAV frame during landing
 
     takeoff_disable_lateral_gains: false
     takeoff_disable_lateral_gains_z: 0.3 # [m]
