@@ -225,8 +225,8 @@ class MpcTracker : public mrs_uav_managers::Tracker {
 
   // trajectory tracking
   std::atomic<bool> trajectory_tracking_in_progress_ = false;
-  double            trajectory_current_time_         = 0;
-  std::mutex        mutex_trajectory_tracking_states_;
+  double trajectory_current_time_ = 0;
+  std::mutex mutex_trajectory_tracking_states_;
 
   // params of the loaded trajectory
   int trajectory_size_ = 0;
@@ -3350,7 +3350,7 @@ std::tuple<bool, std::string, bool> MpcTracker::loadTrajectory(const mrs_msgs::m
   {
 
     geometry_msgs::msg::PoseArray debug_trajectory_out;
-    debug_trajectory_out.header.stamp    = clock_->now();
+    debug_trajectory_out.header.stamp    = msg.header.stamp;
     debug_trajectory_out.header.frame_id = common_handlers_->transformer->resolveFrame(msg.header.frame_id);
 
     {
@@ -3376,11 +3376,11 @@ std::tuple<bool, std::string, bool> MpcTracker::loadTrajectory(const mrs_msgs::m
 
     visualization_msgs::msg::Marker marker;
 
-    marker.header.stamp     = clock_->now();
+    marker.header.stamp     = msg.header.stamp;
     marker.header.frame_id  = common_handlers_->transformer->resolveFrame(msg.header.frame_id);
     marker.type             = visualization_msgs::msg::Marker::LINE_LIST;
     marker.color.a          = 1;
-    marker.scale.x          = 0.05;
+    marker.scale.x          = 0.1;
     marker.color.r          = 1;
     marker.color.g          = 0;
     marker.color.b          = 0;
