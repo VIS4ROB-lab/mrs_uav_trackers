@@ -23,6 +23,7 @@
 #include <mrs_msgs/msg/future_trajectory.hpp>
 #include <mrs_msgs/msg/mpc_prediction_full_state.hpp>
 #include <mrs_msgs/msg/mpc_tracker_diagnostics.hpp>
+#include <mrs_msgs/msg/uav_diagnostics.hpp>
 #include <mrs_msgs/msg/velocity_reference.hpp>
 #include <mrs_msgs/msg/velocity_reference_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -266,6 +267,7 @@ class MpcTracker : public mrs_uav_managers::Tracker {
       ph_current_trajectory_point_;
   mrs_lib::PublisherHandler<geometry_msgs::msg::PoseStamped>
       ph_first_reference_point_;
+  mrs_lib::PublisherHandler<mrs_msgs::msg::UavDiagnostics> ph_uav_diagnostics_;
 
   std::atomic<bool> mpc_computed_ = false;
 
@@ -759,6 +761,9 @@ bool MpcTracker::initialize(
       mrs_lib::PublisherHandler<geometry_msgs::msg::PoseStamped>(
           node_,
           "~/" + private_handlers_->name_space + "/first_reference_point");
+  ph_uav_diagnostics_ =
+      mrs_lib::PublisherHandler<mrs_msgs::msg::UavDiagnostics>(
+          node_, "~/uav_diagnostics_out");
   pub_debug_processed_trajectory_poses_ =
       mrs_lib::PublisherHandler<geometry_msgs::msg::PoseArray>(
           node_,
@@ -3817,6 +3822,11 @@ void MpcTracker::increaseCurrentTrajectoryTime(const double dt) {
     } else {
 
       trajectory_tracking_in_progress_ = false;
+
+      mrs_msgs::msg::UavDiagnostics uav_msg;
+      uav_msg.stamp = clock_->now();
+      uav_msg.state = "trajectory finished";
+      ph_uav_diagnostics_.publish(uav_msg);
 
       RCLCPP_INFO(node_->get_logger(), "[MpcTracker]: done tracking trajectory, current time in trajectory=%f, trajectory_duration=%f", trajectory_current_time, trajectory_duration);
     }
