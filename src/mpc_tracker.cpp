@@ -3386,6 +3386,8 @@ std::tuple<bool, std::string, bool> MpcTracker::loadTrajectory(const mrs_msgs::m
     marker.type             = visualization_msgs::msg::Marker::LINE_LIST;
     marker.color.a          = 1;
     marker.scale.x          = 0.1;
+    marker.scale.y          = 0.1;
+    marker.scale.z          = 0.1;
     marker.color.r          = 1;
     marker.color.g          = 0;
     marker.color.b          = 0;
