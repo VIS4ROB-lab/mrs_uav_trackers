@@ -3336,6 +3336,11 @@ std::tuple<bool, std::string, bool> MpcTracker::loadTrajectory(const mrs_msgs::m
       }
 
       //}
+
+      mrs_msgs::msg::UavDiagnostics uav_msg;
+      uav_msg.stamp = clock_->now();
+      uav_msg.state = "trajectory tracking started";
+      ph_uav_diagnostics_.publish(uav_msg);
     }
 
     trajectory_size_             = trajectory_size;
