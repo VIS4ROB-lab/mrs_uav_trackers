@@ -26,10 +26,9 @@
 #include <mrs_msgs/msg/uav_diagnostics.hpp>
 #include <mrs_msgs/msg/velocity_reference.hpp>
 #include <mrs_msgs/msg/velocity_reference_stamped.hpp>
+#include <nav_msgs/msg/path.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/string.hpp>
-#include <visualization_msgs/msg/marker.hpp>
-#include <visualization_msgs/msg/marker_array.hpp>
 
 //}
 
@@ -154,10 +153,8 @@ class MpcTracker : public mrs_uav_managers::Tracker {
       pub_diagnostics_;
   mrs_lib::PublisherHandler<std_msgs::msg::String> pub_status_string_;
 
-  mrs_lib::PublisherHandler<geometry_msgs::msg::PoseArray>
-      pub_debug_processed_trajectory_poses_;
-  mrs_lib::PublisherHandler<visualization_msgs::msg::MarkerArray>
-      pub_debug_processed_trajectory_markers_;
+  mrs_lib::PublisherHandler<nav_msgs::msg::Path>
+      pub_debug_processed_trajectory_path_;
 
   mrs_msgs::msg::UavState uav_state_;
   std::mutex mutex_uav_state_;
@@ -764,14 +761,10 @@ bool MpcTracker::initialize(
   ph_uav_diagnostics_ =
       mrs_lib::PublisherHandler<mrs_msgs::msg::UavDiagnostics>(
           node_, "~/uav_diagnostics_out");
-  pub_debug_processed_trajectory_poses_ =
-      mrs_lib::PublisherHandler<geometry_msgs::msg::PoseArray>(
+  pub_debug_processed_trajectory_path_ =
+      mrs_lib::PublisherHandler<nav_msgs::msg::Path>(
           node_,
-          "~/" + private_handlers_->name_space + "/trajectory_processed/poses");
-  pub_debug_processed_trajectory_markers_ =
-      mrs_lib::PublisherHandler<visualization_msgs::msg::MarkerArray>(
-          node_, "~/" + private_handlers_->name_space +
-                     "/trajectory_processed/markers");
+          "~/" + private_handlers_->name_space + "/trajectory_processed/path");
 
   // preallocate predicted trajectory
   predicted_trajectory_ = MatrixXd::Zero(MPC_HORIZON_LENGTH * MPC_N_STATES, 1);
@@ -3359,71 +3352,31 @@ std::tuple<bool, std::string, bool> MpcTracker::loadTrajectory(const mrs_msgs::m
 
   {
 
-    geometry_msgs::msg::PoseArray debug_trajectory_out;
-    debug_trajectory_out.header.stamp    = msg.header.stamp;
-    debug_trajectory_out.header.frame_id = common_handlers_->transformer->resolveFrame(msg.header.frame_id);
+    nav_msgs::msg::Path msg_out;
+
+    msg_out.header.stamp    = msg.header.stamp;
+    msg_out.header.frame_id = common_handlers_->transformer->resolveFrame(msg.header.frame_id);
 
     {
       std::scoped_lock lock(mutex_des_whole_trajectory_);
 
       for (int i = 0; i < trajectory_size; i++) {
 
-        geometry_msgs::msg::Pose new_pose;
+        geometry_msgs::msg::PoseStamped pose;
 
-        new_pose.position.x = (*des_x_whole_trajectory_)(i);
-        new_pose.position.y = (*des_y_whole_trajectory_)(i);
-        new_pose.position.z = (*des_z_whole_trajectory_)(i);
+        pose.header = msg_out.header;
 
-        new_pose.orientation = mrs_lib::AttitudeConverter(0, 0, (*des_heading_whole_trajectory_)(i));
+        pose.pose.position.x = des_x_whole_trajectory(i);
+        pose.pose.position.y = des_y_whole_trajectory(i);
+        pose.pose.position.z = des_z_whole_trajectory(i);
 
-        debug_trajectory_out.poses.push_back(new_pose);
+        pose.pose.orientation = mrs_lib::AttitudeConverter(0, 0, des_heading_whole_trajectory(i));
+
+        msg_out.poses.push_back(pose);
       }
     }
 
-    pub_debug_processed_trajectory_poses_.publish(debug_trajectory_out);
-
-    visualization_msgs::msg::MarkerArray msg_out;
-
-    visualization_msgs::msg::Marker marker;
-
-    marker.header.stamp     = msg.header.stamp;
-    marker.header.frame_id  = common_handlers_->transformer->resolveFrame(msg.header.frame_id);
-    marker.type             = visualization_msgs::msg::Marker::LINE_LIST;
-    marker.color.a          = 1;
-    marker.scale.x          = 0.1;
-    marker.scale.y          = 0.1;
-    marker.scale.z          = 0.1;
-    marker.color.r          = 1;
-    marker.color.g          = 0;
-    marker.color.b          = 0;
-    marker.pose.orientation = mrs_lib::AttitudeConverter(0, 0, 0);
-
-    {
-      std::scoped_lock lock(mutex_des_whole_trajectory_);
-
-      for (int i = 0; i < trajectory_size - 1; i++) {
-
-        geometry_msgs::msg::Point point1;
-
-        point1.x = des_x_whole_trajectory(i);
-        point1.y = des_y_whole_trajectory(i);
-        point1.z = des_z_whole_trajectory(i);
-
-        marker.points.push_back(point1);
-
-        geometry_msgs::msg::Point point2;
-
-        point2.x = des_x_whole_trajectory(i + 1);
-        point2.y = des_y_whole_trajectory(i + 1);
-        point2.z = des_z_whole_trajectory(i + 1);
-
-        marker.points.push_back(point2);
-      }
-    }
-
-    msg_out.markers.push_back(marker);
-
-    pub_debug_processed_trajectory_markers_.publish(msg_out);
+    pub_debug_processed_trajectory_path_.publish(msg_out);
   }
 
   //}
